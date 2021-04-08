@@ -13,10 +13,6 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-index_file=0
-file="index$index_file.html"
-count=0
-
 main() {
 	test -n "$1" || usage
 	test -n "$2" || usage
@@ -81,32 +77,8 @@ main() {
       -c "set nomore" \
       -c ":g/SortByDate:/,/SortByDate/ s/$\n/@@@" \
       -c ":sort!" -c ":%s/@@@/\r/g" -c ":g/SortByDate/d" \
-      -c ":wq" $src/index.html 2> /dev/null
-    sed -i "1s/^/<h1 style=\"display: none;\"> HOME <\/h1>\n /" $src/index.html
-
-    vim -N -u NONE -n \
-      -c "set nomore" \
-      -c ":g/SortByDate:/,/SortByDate/ s/$\n/@@@" \
-      -c ":sort!" -c ":%s/@@@/\r/g" -c ":g/SortByDate/d" \
-      -c ":wq" $src/archive.html 2> /dev/null
-    sed -i "1s/^/<h1 style=\"display: none;\"> ARCHIVE <\/h1>\n <ul>\n/" $src/archive.html
-    echo "</ul>" >> $src/archive.html
-
-    # Pagination
-    while true
-    do
-        line=$(awk '/<h2 id/ && ++n==13 {print NR}' $src/index.html)
-        if [ "$line" == "" ];then
-            break
-        fi
-        (head -$(($line-1)) > $src/index$index_file.html; cat > $src/index$((index_file+1)).html) < $src/index.html
-        cp $src/index$(($index_file+1)).html $src/index.html
-        printf "\
-<center><a href=\"index$((index_file+1)).html\">Next>></a></center>\n" >> "$src/index$index_file.html"
-        index_file=$(($index_file+1))
-    done
-    mv $src/index0.html $src/index.html
-
+      -c ":wq" $src/index.html
+    sed -i "1s/^/<h1 style=\"display: none;\"> HOME <\/h1>\n /" $1/index.html
 		echo "$fs" | grep '\.html$' |
 		render_html_files "$src" "$dst" "$title"
 
@@ -212,7 +184,7 @@ render_html_files() {
 render_md_files_pandoc() {
   while read -r f
   do
-    # echo "pandoc----------------------------------------$f"
+    echo "pandoc----------------------------------------$f"
     TITLE=$(grep -i title "$1/$f" | head -n1 | awk -F ": " '{ print $2 }')
     DESC=$(grep -i description "$1/$f" | head -n1 | awk -F ": " '{ print $2 }')
     IMAGE=$(grep -i image "$1/$f" | head -n1 | awk -F ": " '{ print $2 }')
@@ -259,17 +231,13 @@ render_html_file() {
 	}'
 }
 
-
 generate_post_list() {
   if [ -f "$1/index.html" ]; then
-    rm $1/index*.html
-  fi
-  if [ -f "$1/archive.html" ]; then
-    rm $1/archive.html
+    rm $1/index.html
   fi
 	while read -r f
   do
-    if [ "$f" == ./index.html ] || [ "$f" == "./about.md" ] || [ "$f" == ./archive.html ]; then
+    if [ "$f" == "./index.html" ] || [ "$f" == "./about.md" ]; then
       continue
     fi
     TITLE=$(grep -i title "$1/$f" | head -n1 | awk -F ":" '{ print $2 }')
@@ -285,14 +253,8 @@ SortByDate:$DATE
 <p style=\"text-align:justified;\">$DESC<br/>\n\
 <strong><u>KEYWORDS</u>: </strong>[$TAGS ]</p>\n\
 SortByDate\n\n" >> "$1/index.html"
-
-    printf "\
-SortByDate:$DATE
-<li><b>[$DATE] </b><a href=\"/${f%\.md}.html\">$TITLE</a>\n\
-SortByDate\n\n" >> "$1/archive.html"
   done
 }
-
 
 list_pages() {
 	e="\\( -name '*.html' -o -name '*.md' \\)"

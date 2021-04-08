@@ -22,3 +22,14 @@ echo '<html><title></title>' > src/_header.html
 bin/ssg5 src dst 'Test' 'http://www'
 firefox dst/index.html
 ```
+
+## My customizations
+
+1. Generate a homepage with post list sorted according to date defined in the
+   metadata of the md files
+
+2. Paginate the post list with specified number of posts per page
+
+3. Generate a post archive sorted by date
+
+4. Use pandoc for generating the html files
