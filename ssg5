@@ -95,8 +95,8 @@ main() {
     # Pagination
     while true
     do
-        line=$(awk '/<h2 id/ && ++n==13 {print NR}' $src/index.html)
-        if [ "$line" == "" ];then
+        line=$(awk '/<h1 id/ && ++n==13 {print NR}' $src/index.html)
+        if [ "$line" = "" ];then
             break
         fi
         (head -$(($line-1)) > $src/index$index_file.html; cat > $src/index$((index_file+1)).html) < $src/index.html
@@ -105,7 +105,9 @@ main() {
 <center><a href=\"index$((index_file+1)).html\">Next>></a></center>\n" >> "$src/index$index_file.html"
         index_file=$(($index_file+1))
     done
-    mv $src/index0.html $src/index.html
+    if [ -f $src/index0.html ];then
+        mv $src/index0.html $src/index.html
+    fi
 
 		echo "$fs" | grep '\.html$' |
 		render_html_files "$src" "$dst" "$title"
@@ -212,7 +214,7 @@ render_html_files() {
 render_md_files_pandoc() {
   while read -r f
   do
-    # echo "pandoc----------------------------------------$f"
+    echo "pandoc----------------------------------------$f"
     TITLE=$(grep -i title "$1/$f" | head -n1 | awk -F ": " '{ print $2 }')
     DESC=$(grep -i description "$1/$f" | head -n1 | awk -F ": " '{ print $2 }')
     IMAGE=$(grep -i image "$1/$f" | head -n1 | awk -F ": " '{ print $2 }')
@@ -269,7 +271,7 @@ generate_post_list() {
   fi
 	while read -r f
   do
-    if [ "$f" == ./index.html ] || [ "$f" == "./about.md" ] || [ "$f" == ./archive.html ]; then
+    if [ "$f" = "$src/index.html" ] || [ "$f" = "./about.md" ] || [ "$f" = "$src/archive.html" ]; then
       continue
     fi
     TITLE=$(grep -i title "$1/$f" | head -n1 | awk -F ":" '{ print $2 }')
@@ -279,9 +281,9 @@ generate_post_list() {
     IMAGE=$(grep -i image "$1/$f" | head -n1 | awk -F ":" '{ print $2 }')
     printf "\
 SortByDate:$DATE
-<h2 id=\"$TITLE\" style=\"border-bottom: none; padding-bottom: 0em;\">\n\
+<h1 id=\"$TITLE\" style=\"font-size:1.3em;border-bottom: none; padding-bottom: 0em;\">\n\
   <a href=\"/${f%\.md}.html\">$TITLE</a>\n\
-</h2>\n\
+</h1>\n\
 <p style=\"text-align:justified;\">$DESC<br/>\n\
 <strong><u>KEYWORDS</u>: </strong>[$TAGS ]</p>\n\
 SortByDate\n\n" >> "$1/index.html"
