@@ -27,10 +27,10 @@ my blogsite, which has been built with this script. -->
 PATH="$PATH:${$(find ~/.local/bin -printf %p:)%%:}"
 
 mkdir -p packages/ssg5
-git clone https://github.com/TheBagarius/ssg5.git packages/ssg5
-ln -s packages/ssg5/ssg5 ~/.local/bin/ssg
+git clone https://github.com/TheBagarius/ssg5.git bin/ssg5
+ln -s bin/ssg5/ssg5 ~/.local/bin/ssg
 
-cp packages/ss5/template website/
+cp bin/ss5/template website/
 ```
 
 ### Deploy
