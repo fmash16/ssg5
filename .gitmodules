@@ -1,0 +1,6 @@
+[submodule "submodule/cmark"]
+	path = submodule/cmark
+	url = git@github.com:github/cmark-gfm.git
+[submodule "submodule/TOML"]
+	path = submodule/TOML
+	url = git@github.com:cktan/tomlc99.git

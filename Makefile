@@ -2,7 +2,7 @@ SHELL=/bin/sh
 .DELETE_ON_ERROR:
 
 # Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
-TARGET_EXEC := ssg5
+TARGET_EXEC := ssg
 
 BUILD_DIR := ./build
 SRC_DIRS := ./src
